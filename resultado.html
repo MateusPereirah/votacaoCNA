@@ -108,7 +108,7 @@
               .map((c) => `${c}: ${entry.ratings[c] || 0}`)
               .join("<br>")}
           </td>
-          <td>${entry.timestamp}</td>
+          <td>${new Date(entry.timestamp).toLocaleDateString("pt-BR")}</td>
         `;
             tbody.appendChild(row);
             console.log(entry.timestamp);
