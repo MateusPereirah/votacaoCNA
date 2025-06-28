@@ -39,7 +39,7 @@ exports.handler = async (event) => {
   } catch (err) {
     console.error("Erro ao inserir no banco:", err);
 
-    if (error.code === "23505") {
+    if (err.code === "23505") {
       // Código 23505 = violação de UNIQUE constraint
       return {
         statusCode: 400,
