@@ -1,0 +1,24 @@
+{
+  "name": "votacaofeira",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "netlify dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateusPereirah/votacaoCNA.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MateusPereirah/votacaoCNA/issues"
+  },
+  "homepage": "https://github.com/MateusPereirah/votacaoCNA#readme",
+  "description": "",
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
+}
