@@ -239,7 +239,7 @@
           headers: {
             "Content-Type": "application/json",
           },
-        }).then((response) => {
+        }).then(async (response) => {
           if (response.ok) {
             document.querySelector("#ratingsContainer").style.display = "none";
             document.getElementById("name").style.display = "none";
@@ -253,7 +253,8 @@
             document.getElementById("thanksMessage").style.display = "block";
             setTimeout(() => location.reload(), 5000);
           } else {
-            alert("Erro ao salvar voto. Tente novamente.");
+            const errorData = await response.json();
+            alert(errorData.message || "Erro ao salvar voto. Tente novamente.");
           }
         });
       }

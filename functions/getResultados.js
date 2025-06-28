@@ -22,6 +22,7 @@ exports.handler = async () => {
         "New Zealand": row.new_zealand,
         Malta: row.malta,
       },
+      timestamp: row.created_at,
     }));
 
     return {

@@ -61,6 +61,7 @@
             <th>CPF</th>
             <th>Telefone</th>
             <th>Notas</th>
+            <th>Data</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -106,6 +107,7 @@
               .map((c) => `${c}: ${entry.ratings[c] || 0}`)
               .join("<br>")}
           </td>
+          <td>${new Date(entry.timestamp).toLocaleDateString("pt-BR")}</td>
         `;
             tbody.appendChild(row);
 
@@ -159,7 +161,7 @@
         });
 
       function exportCSV() {
-        const headers = ["Nome", "CPF", "Telefone", ...countries];
+        const headers = ["Nome", "CPF", "Telefone", ...countries, "Data"];
         const rows = [headers];
 
         data.forEach((entry) => {

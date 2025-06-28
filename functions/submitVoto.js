@@ -38,6 +38,14 @@ exports.handler = async (event) => {
     };
   } catch (err) {
     console.error("Erro ao inserir no banco:", err);
+
+    if (error.code === "23505") {
+      // Código 23505 = violação de UNIQUE constraint
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "CPF já utilizado para votação." }),
+      };
+    }
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Erro ao salvar no banco de dados." }),
