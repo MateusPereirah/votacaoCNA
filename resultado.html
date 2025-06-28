@@ -99,17 +99,6 @@
 
             const row = document.createElement("tr");
 
-            let date;
-            if (!isNaN(Number(entry.timestamp))) {
-              date = new Date(Number(entry.timestamp));
-            } else {
-              const parts = entry.timestamp.split("/");
-              if (parts.length === 3) {
-                date = new Date(parts[2], parts[1] - 1, parts[0]);
-              } else {
-                date = new Date(entry.timestamp);
-              }
-            }
             row.innerHTML = `
           <td>${entry.name}</td>
           <td>${entry.cpf}</td>
@@ -119,9 +108,10 @@
               .map((c) => `${c}: ${entry.ratings[c] || 0}`)
               .join("<br>")}
           </td>
-          <td>${date.toLocaleDateString("pt-BR")}</td>
+          <td>${entry.timestamp}</td>
         `;
             tbody.appendChild(row);
+            console.log(entry.timestamp);
 
             countries.forEach((c) => {
               if (entry.ratings[c]) {
