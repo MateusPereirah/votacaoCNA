@@ -210,23 +210,36 @@
       }
 
       function submitRatings() {
+        const nameInput = document.getElementById("name").value.trim();
+        const cpfInput = document.getElementById("cpf").value.trim();
+        const phoneInput = document.getElementById("phone").value.trim();
+
+        if (!nameInput || !cpfInput || !validateCPF(cpfInput)) {
+          alert("Preencha corretamente nome e CPF.");
+          return;
+        }
+
+        // Verificar se ao menos um país foi avaliado
+        const atLeastOneRated = Object.values(ratings).some((val) => val > 0);
+        if (!atLeastOneRated) {
+          alert("Avalie pelo menos um país.");
+          return;
+        }
+
         const data = {
-          name,
-          cpf,
-          phone,
+          name: nameInput,
+          cpf: cpfInput,
+          phone: phoneInput,
           ratings,
         };
 
-        fetch(
-          "https://script.google.com/macros/s/AKfycbwx2srE7o1ucYxdBLQapAAUozzmb-I-OI4r6c2rjTD2BHCdL3AF5-fQmTf_LQNfb4sV/exec",
-          {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        ).then((response) => {
+        fetch("/.netlify/functions/submitVoto", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then((response) => {
           if (response.ok) {
             document.querySelector("#ratingsContainer").style.display = "none";
             document.getElementById("name").style.display = "none";
@@ -236,7 +249,7 @@
             document.getElementById("confirmSound").play();
             document.getElementById(
               "thanksMessage"
-            ).textContent = `Obrigado, ${name}! Sua avaliação foi registrada.`;
+            ).textContent = `Obrigado, ${nameInput}! Sua avaliação foi registrada.`;
             document.getElementById("thanksMessage").style.display = "block";
             setTimeout(() => location.reload(), 5000);
           } else {

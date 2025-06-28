@@ -80,77 +80,83 @@
         "Malta",
       ];
 
-      const data = JSON.parse(localStorage.getItem("ratingsList") || "[]");
       const tbody = document.querySelector("#resultsTable tbody");
       const countrySums = {};
       const countryCounts = {};
+      const data = [];
 
       countries.forEach((country) => {
         countrySums[country] = 0;
         countryCounts[country] = 0;
       });
 
-      data.forEach((entry) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-        <td>${entry.name}</td>
-        <td>${entry.cpf}</td>
-        <td>${entry.phone || ""}</td>
-        <td>
-          ${countries.map((c) => `${c}: ${entry.ratings[c] || 0}`).join("<br>")}
-        </td>
-      `;
-        tbody.appendChild(row);
+      fetch("/.netlify/functions/getResultados")
+        .then((res) => res.json())
+        .then((entries) => {
+          entries.forEach((entry) => {
+            data.push(entry); // Guarda para exportar depois
 
-        countries.forEach((c) => {
-          if (entry.ratings[c]) {
-            countrySums[c] += entry.ratings[c];
-            countryCounts[c]++;
-          }
-        });
-      });
+            const row = document.createElement("tr");
+            row.innerHTML = `
+          <td>${entry.name}</td>
+          <td>${entry.cpf}</td>
+          <td>${entry.phone || ""}</td>
+          <td>
+            ${countries
+              .map((c) => `${c}: ${entry.ratings[c] || 0}`)
+              .join("<br>")}
+          </td>
+        `;
+            tbody.appendChild(row);
 
-      const averageRatings = countries.map((c) =>
-        countryCounts[c] ? countrySums[c] / countryCounts[c] : 0
-      );
+            countries.forEach((c) => {
+              if (entry.ratings[c]) {
+                countrySums[c] += Number(entry.ratings[c]);
+                countryCounts[c]++;
+              }
+            });
+          });
 
-      const ctx = document.getElementById("ratingChart").getContext("2d");
-      new Chart(ctx, {
-        type: "pie",
-        data: {
-          labels: countries,
-          datasets: [
-            {
-              label: "Média de notas",
-              data: averageRatings,
-              backgroundColor: [
-                "#007bff",
-                "#28a745",
-                "#ffc107",
-                "#dc3545",
-                "#6610f2",
-                "#17a2b8",
-                "#6f42c1",
+          const averageRatings = countries.map((c) =>
+            countryCounts[c] ? countrySums[c] / countryCounts[c] : 0
+          );
+
+          const ctx = document.getElementById("ratingChart").getContext("2d");
+          new Chart(ctx, {
+            type: "pie",
+            data: {
+              labels: countries,
+              datasets: [
+                {
+                  label: "Média de notas",
+                  data: averageRatings,
+                  backgroundColor: [
+                    "#007bff",
+                    "#28a745",
+                    "#ffc107",
+                    "#dc3545",
+                    "#6610f2",
+                    "#17a2b8",
+                    "#6f42c1",
+                  ],
+                },
               ],
             },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-            },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  return `${context.label}: ${context.parsed.toFixed(2)}`;
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { position: "bottom" },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return `${context.label}: ${context.parsed.toFixed(2)}`;
+                    },
+                  },
                 },
               },
             },
-          },
-        },
-      });
+          });
+        });
 
       function exportCSV() {
         const headers = ["Nome", "CPF", "Telefone", ...countries];
