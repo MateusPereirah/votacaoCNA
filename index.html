@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Avaliação de Países</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f8f9fa;
+        margin: 0;
+        padding: 2rem 1rem;
+        text-align: center;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 1.5rem;
+      }
+
+      input {
+        display: block;
+        margin: 0.5rem auto;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 400px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+
+      .country {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 1rem auto;
+        padding: 1rem;
+        background: #ffffff;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        transition: border 0.3s;
+      }
+
+      .country.highlight {
+        border: 2px solid red;
+      }
+
+      .country-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .country-info img {
+        width: 40px;
+        height: 28px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      .rating {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .square {
+        width: 30px;
+        height: 30px;
+        background: #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+        color: #333;
+      }
+
+      .square.selected {
+        background: #007bff;
+        color: white;
+      }
+
+      button.submit {
+        margin-top: 2rem;
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .thanks {
+        display: none;
+        font-size: 1.4rem;
+        color: green;
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Avalie os Países de 1 a 5</h1>
+
+    <input
+      type="text"
+      id="name"
+      placeholder="Digite seu nome completo"
+      autocomplete="off"
+    />
+    <input
+      type="text"
+      id="cpf"
+      placeholder="Digite seu CPF (000.000.000-00)"
+      autocomplete="off"
+    />
+    <input
+      type="text"
+      id="phone"
+      placeholder="Telefone (opcional)"
+      autocomplete="off"
+    />
+
+    <div id="ratingsContainer"></div>
+
+    <button class="submit" onclick="submitRatings()">Enviar Avaliação</button>
+
+    <div class="thanks" id="thanksMessage"></div>
+    <audio
+      id="confirmSound"
+      src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
+    ></audio>
+
+    <script>
+      const countries = [
+        {
+          name: "Scotland",
+          flag: "https://upload.wikimedia.org/wikipedia/commons/1/10/Flag_of_Scotland.svg",
+        },
+        { name: "USA", flag: "https://flagcdn.com/us.svg" },
+        { name: "Canada", flag: "https://flagcdn.com/ca.svg" },
+        {
+          name: "England",
+          flag: "https://upload.wikimedia.org/wikipedia/commons/b/be/Flag_of_England.svg",
+        },
+        { name: "Ireland", flag: "https://flagcdn.com/ie.svg" },
+        { name: "New Zealand", flag: "https://flagcdn.com/nz.svg" },
+        { name: "Malta", flag: "https://flagcdn.com/mt.svg" },
+      ];
+
+      const container = document.getElementById("ratingsContainer");
+      const ratings = {};
+      const wrappers = {};
+
+      countries.forEach((country) => {
+        ratings[country.name] = 0;
+        const wrapper = document.createElement("div");
+        wrappers[country.name] = wrapper;
+        wrapper.className = "country";
+
+        const info = document.createElement("div");
+        info.className = "country-info";
+        info.innerHTML = `<img src="${country.flag}" alt="${country.name}"><strong>${country.name}</strong>`;
+
+        const ratingBox = document.createElement("div");
+        ratingBox.className = "rating";
+
+        for (let i = 1; i <= 5; i++) {
+          const square = document.createElement("div");
+          square.className = "square";
+          square.textContent = i;
+          square.addEventListener("click", () => {
+            ratings[country.name] = i;
+            wrapper.classList.remove("highlight");
+            const siblings = ratingBox.querySelectorAll(".square");
+            siblings.forEach((s, index) => {
+              s.classList.toggle("selected", index < i);
+            });
+          });
+          ratingBox.appendChild(square);
+        }
+
+        wrapper.appendChild(info);
+        wrapper.appendChild(ratingBox);
+        container.appendChild(wrapper);
+      });
+
+      function validateCPF(cpf) {
+        cpf = cpf.replace(/[^\d]+/g, "");
+        if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+        let sum = 0,
+          rest;
+        for (let i = 1; i <= 9; i++)
+          sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+        rest = (sum * 10) % 11;
+        if (rest === 10 || rest === 11) rest = 0;
+        if (rest !== parseInt(cpf.substring(9, 10))) return false;
+        sum = 0;
+        for (let i = 1; i <= 10; i++)
+          sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+        rest = (sum * 10) % 11;
+        if (rest === 10 || rest === 11) rest = 0;
+        if (rest !== parseInt(cpf.substring(10, 11))) return false;
+        return true;
+      }
+
+      function submitRatings() {
+        const data = {
+          name,
+          cpf,
+          phone,
+          ratings,
+        };
+
+        fetch(
+          "https://script.google.com/macros/s/AKfycbwx2srE7o1ucYxdBLQapAAUozzmb-I-OI4r6c2rjTD2BHCdL3AF5-fQmTf_LQNfb4sV/exec",
+          {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        ).then((response) => {
+          if (response.ok) {
+            document.querySelector("#ratingsContainer").style.display = "none";
+            document.getElementById("name").style.display = "none";
+            document.getElementById("cpf").style.display = "none";
+            document.getElementById("phone").style.display = "none";
+            document.querySelector(".submit").style.display = "none";
+            document.getElementById("confirmSound").play();
+            document.getElementById(
+              "thanksMessage"
+            ).textContent = `Obrigado, ${name}! Sua avaliação foi registrada.`;
+            document.getElementById("thanksMessage").style.display = "block";
+            setTimeout(() => location.reload(), 5000);
+          } else {
+            alert("Erro ao salvar voto. Tente novamente.");
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
