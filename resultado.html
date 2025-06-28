@@ -98,6 +98,18 @@
             data.push(entry); // Guarda para exportar depois
 
             const row = document.createElement("tr");
+
+            let date;
+            if (!isNaN(Number(entry.timestamp))) {
+              date = new Date(Number(entry.timestamp));
+            } else {
+              const parts = entry.timestamp.split("/");
+              if (parts.length === 3) {
+                date = new Date(parts[2], parts[1] - 1, parts[0]);
+              } else {
+                date = new Date(entry.timestamp);
+              }
+            }
             row.innerHTML = `
           <td>${entry.name}</td>
           <td>${entry.cpf}</td>
@@ -107,7 +119,7 @@
               .map((c) => `${c}: ${entry.ratings[c] || 0}`)
               .join("<br>")}
           </td>
-          <td>${new Date(entry.timestamp).toLocaleDateString("pt-BR")}</td>
+          <td>${date.toLocaleDateString("pt-BR")}</td>
         `;
             tbody.appendChild(row);
 
