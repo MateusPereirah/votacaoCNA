@@ -99,6 +99,15 @@
 
             const row = document.createElement("tr");
 
+            const originalDate = new Date(entry.timestamp);
+            const adjustedDate = new Date(
+              originalDate.getTime() - 3 * 60 * 60 * 1000
+            );
+            const formattedDateTime = adjustedDate.toLocaleString("pt-BR", {
+              dateStyle: "short",
+              timeStyle: "short",
+            });
+
             row.innerHTML = `
           <td>${entry.name}</td>
           <td>${entry.cpf}</td>
@@ -108,7 +117,7 @@
               .map((c) => `${c}: ${entry.ratings[c] || 0}`)
               .join("<br>")}
           </td>
-          <td>${new Date(entry.timestamp).toLocaleDateString("pt-BR")}</td>
+          <td>${formattedDateTime}</td>
         `;
             tbody.appendChild(row);
             console.log(entry.timestamp);
@@ -171,6 +180,7 @@
           countries.forEach((c) => {
             row.push(entry.ratings[c] || "");
           });
+          row.push(entry.timestamp);
           rows.push(row);
         });
 
