@@ -94,6 +94,7 @@
       fetch("/.netlify/functions/getResultados")
         .then((res) => res.json())
         .then((entries) => {
+          entries.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
           entries.forEach((entry) => {
             data.push(entry); // Guarda para exportar depois
 
