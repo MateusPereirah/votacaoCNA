@@ -99,11 +99,8 @@
 
             const row = document.createElement("tr");
 
-            const originalDate = new Date(entry.timestamp);
-            const adjustedDate = new Date(
-              originalDate.getTime() - 3 * 60 * 60 * 1000
-            );
-            const formattedDateTime = adjustedDate.toLocaleString("pt-BR", {
+            const date = new Date(entry.timestamp);
+            const formattedDateTime = date.toLocaleString("pt-BR", {
               dateStyle: "short",
               timeStyle: "short",
             });
